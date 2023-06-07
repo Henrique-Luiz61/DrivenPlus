@@ -1,15 +1,73 @@
 import styled from "styled-components";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import axios from "axios";
 
 export default function SignUp() {
+  const [name, setName] = useState("");
+  const [cpf, setCPF] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const navigate = useNavigate();
+
+  function fazerCadastro(e) {
+    e.preventDefault();
+
+    const URL =
+      "https://mock-api.driven.com.br/api/v4/driven-plus/auth/sign-up";
+
+    const objSignUp = {
+      email: email,
+      name: name,
+      cpf: cpf,
+      password: password,
+    };
+
+    const promise = axios.post(URL, objSignUp);
+
+    promise.then((resp) => {
+      console.log(resp.data);
+      navigate("/");
+    });
+    promise.catch((erro) => {
+      console.log(erro.response.data);
+      alert(erro.response.data.message);
+    });
+  }
+
   return (
     <SCContainerPage>
       <SCContainerSignUp>
-        <SCFormContainer>
-          <input type="text" placeholder="Nome" required />
-          <input type="number" placeholder="CPF" required />
-          <input type="email" placeholder="E-mail" required />
-          <input type="password" placeholder="Senha" required />
+        <SCFormContainer onSubmit={fazerCadastro}>
+          <input
+            type="text"
+            placeholder="Nome"
+            required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <input
+            type="number"
+            placeholder="CPF"
+            required
+            value={cpf}
+            onChange={(e) => setCPF(e.target.value)}
+          />
+          <input
+            type="email"
+            placeholder="E-mail"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <input
+            type="password"
+            placeholder="Senha"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
 
           <button type="submit">CADASTRAR</button>
         </SCFormContainer>

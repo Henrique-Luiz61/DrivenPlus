@@ -5,6 +5,9 @@ import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import Subscriptions from "./pages/Subscriptions";
 import Home from "./pages/Home";
+import SubscriptionIDPLANO from "./pages/SubscriptionIDPLANO";
+import AuthProvider from "./contexts/auth";
+import axios from "axios";
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -17,16 +20,24 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 function App() {
+  axios.defaults.headers.common["Authorization"] = "3oPD8DWbkC2ysAsbZJJEfSYf";
+
   return (
     <BrowserRouter>
       <ResetStyle />
       <GlobalStyle />
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/sign-up" element={<SignUp />} />
-        <Route path="/subscriptions" element={<Subscriptions />} />
-        <Route path="/home" element={<Home />} />
-      </Routes>
+      <AuthProvider>
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route path="/sign-up" element={<SignUp />} />
+          <Route path="/subscriptions" element={<Subscriptions />} />
+          <Route path="/home" element={<Home />} />
+          <Route
+            path="/subscription/:idPlano"
+            element={<SubscriptionIDPLANO />}
+          />
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

@@ -1,8 +1,40 @@
 import styled from "styled-components";
 import logo from "../img/logoDrivenPlus.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useContext, useState } from "react";
+import { AuthContext } from "../contexts/auth";
+import axios from "axios";
 
 export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
+  const { setInfo } = useContext(AuthContext);
+
+  function fazerLogin(e) {
+    e.preventDefault();
+
+    const URL = "https://mock-api.driven.com.br/api/v4/driven-plus/auth/login";
+
+    const objLogin = {
+      email: email,
+      password: password,
+    };
+
+    const promise = axios.post(URL, objLogin);
+
+    promise.then((resp) => {
+      console.log(resp.data);
+      setInfo(resp.data);
+      navigate("/subscriptions");
+    });
+    promise.catch((erro) => {
+      console.log(erro.response.data);
+      alert(erro.response.data.message);
+    });
+  }
+
   return (
     <SCContainerPage>
       <SCContainerLogin>
@@ -10,9 +42,21 @@ export default function Login() {
           <img src={logo} alt="logo drivenplus" />
         </SCDivLogo>
 
-        <SCFormContainer>
-          <input type="email" placeholder="E-mail" required />
-          <input type="password" placeholder="Senha" required />
+        <SCFormContainer onSubmit={fazerLogin}>
+          <input
+            type="email"
+            placeholder="E-mail"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <input
+            type="password"
+            placeholder="Senha"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
 
           <button type="submit">ENTRAR</button>
         </SCFormContainer>

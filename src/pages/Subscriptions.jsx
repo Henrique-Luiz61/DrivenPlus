@@ -1,26 +1,48 @@
-import plano1 from "../img/plano1.png";
-import plano2 from "../img/plano2.png";
-import plano3 from "../img/plano3.png";
+import { useEffect } from "react";
 import styled from "styled-components";
+import { useContext, useState } from "react";
+import { AuthContext } from "../contexts/auth";
+import axios from "axios";
+import { Link } from "react-router-dom";
 
 export default function Subscriptions() {
+  const { infoUsuario, infoPlanos, setInfoPlanos } = useContext(AuthContext);
+
+  useEffect(() => {
+    const URL =
+      "https://mock-api.driven.com.br/api/v4/driven-plus/subscriptions/memberships";
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${infoUsuario.token}`,
+      },
+    };
+
+    const promise = axios.get(URL, config);
+
+    promise.then((resp) => {
+      console.log(resp.data);
+      setInfoPlanos(resp.data);
+    });
+    promise.catch((erro) => {
+      console.log(erro.response.data);
+      alert(erro.data.response.data.message);
+    });
+  }, []);
+
   return (
     <SCContainerPage>
       <SCEscolhaPlano>Escolha seu Plano</SCEscolhaPlano>
 
       <SCContainerPlanos>
-        <SCPlano>
-          <img src={plano1} alt="plano 1" />
-          <h2>R$ 39,99</h2>
-        </SCPlano>
-        <SCPlano>
-          <img src={plano2} alt="plano 2" />
-          <h2>R$ 69,99</h2>
-        </SCPlano>
-        <SCPlano>
-          <img src={plano3} alt="plano 3" />
-          <h2>R$ 99,99</h2>
-        </SCPlano>
+        {infoPlanos.map((p) => (
+          <Link key={p.id} to={`/subscription/${p.id}`}>
+            <SCPlano>
+              <img src={p.image} alt="imagem drivenPlus" />
+              <h2>R$ {p.price}</h2>
+            </SCPlano>
+          </Link>
+        ))}
       </SCContainerPlanos>
     </SCContainerPage>
   );
