@@ -33,7 +33,7 @@ function App() {
           <Route path="/subscriptions" element={<Subscriptions />} />
           <Route path="/home" element={<Home />} />
           <Route
-            path="/subscription/:idPlano"
+            path="subscriptions/:idPlano"
             element={<SubscriptionIDPLANO />}
           />
         </Routes>

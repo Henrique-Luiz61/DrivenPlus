@@ -36,12 +36,12 @@ export default function Subscriptions() {
 
       <SCContainerPlanos>
         {infoPlanos.map((p) => (
-          <Link key={p.id} to={`/subscription/${p.id}`}>
-            <SCPlano>
+          <SCPlano key={p.id}>
+            <Link to={`/subscriptions/${p.id}`}>
               <img src={p.image} alt="imagem drivenPlus" />
               <h2>R$ {p.price}</h2>
-            </SCPlano>
-          </Link>
+            </Link>
+          </SCPlano>
         ))}
       </SCContainerPlanos>
     </SCContainerPage>

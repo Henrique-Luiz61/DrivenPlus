@@ -1,17 +1,29 @@
 import styled from "styled-components";
 import setaVoltar from "../img/setaVoltar.png";
-import plano1 from "../img/plano1.png";
 import prancheta from "../img/prancheta.png";
+import fecharX from "../img/fecharX.png";
 import money from "../img/money.png";
-import Confirmar from "./components/Confirmar";
-import { useParams, Link } from "react-router-dom";
-import { useEffect, useContext } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { useEffect, useContext, useState } from "react";
 import { AuthContext } from "../contexts/auth";
 import axios from "axios";
 
 export default function SubscriptionIDPLANO() {
   const { idPlano } = useParams();
-  const { infoUsuario, infoPlanoInd, setPlanoInd } = useContext(AuthContext);
+  const {
+    infoUsuario,
+    infoPlanoInd,
+    setPlanoInd,
+    displayModal,
+    setDisModal,
+    setAssinante,
+  } = useContext(AuthContext);
+  const [nome, setNome] = useState("");
+  const [digitos, setDigitos] = useState("");
+  const [codSeg, setCodSeg] = useState("");
+  const [validade, setValidade] = useState("");
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const URL = `https://mock-api.driven.com.br/api/v4/driven-plus/subscriptions/memberships/${idPlano}`;
@@ -25,13 +37,59 @@ export default function SubscriptionIDPLANO() {
     const promise = axios.get(URL, config);
 
     promise.then((resp) => {
+      console.log(resp.data);
       setPlanoInd(resp.data);
-      console.log("plano id: ", resp.data);
     });
     promise.catch((erro) => {
+      console.log(erro.data);
       alert(erro.response.data.message);
     });
   }, []);
+
+  function assinar() {
+    setDisModal("flex");
+  }
+
+  function confirmar(e) {
+    e.preventDefault();
+
+    const URL =
+      "https://mock-api.driven.com.br/api/v4/driven-plus/subscriptions";
+
+    const novaAssinatura = {
+      membershipId: infoUsuario.id,
+      cardName: nome,
+      cardNumber: digitos,
+      securityNumber: codSeg,
+      expirationDate: validade,
+    };
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${infoUsuario.token}`,
+      },
+    };
+
+    const promise = axios.post(URL, novaAssinatura, config);
+
+    promise.then((resp) => {
+      console.log(resp.data);
+      setAssinante(resp.data);
+      navigate("/home");
+    });
+    promise.catch((erro) => {
+      console.log(erro.response.data);
+      alert(erro.response.data.message);
+    });
+  }
+
+  if (
+    infoPlanoInd.perks === undefined ||
+    infoPlanoInd.perks === null ||
+    infoPlanoInd.perks === ""
+  ) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <SCContainerPage>
@@ -67,18 +125,59 @@ export default function SubscriptionIDPLANO() {
         <p>R${infoPlanoInd.price} cobrados mensalmente</p>
       </SCInfoPlano>
 
-      {/*<Confirmar />*/}
-
-      <SCContainerForm>
-        <input type="text" placeholder="Nome impresso no cartão" />
-        <input type="number" placeholder="Digitos do cartão" />
+      <SCContainerForm onSubmit={confirmar}>
+        <input
+          type="text"
+          placeholder="Nome impresso no cartão"
+          required
+          value={nome}
+          onChange={(e) => setNome(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Digitos do cartão"
+          required
+          value={digitos}
+          onChange={(e) => setDigitos(e.target.value)}
+        />
 
         <SCDiv>
-          <input type="number" placeholder="Código de segurança" />
-          <input type="text" placeholder="Validade" />
+          <input
+            type="number"
+            placeholder="Código de segurança"
+            required
+            value={codSeg}
+            onChange={(e) => setCodSeg(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Validade"
+            required
+            value={validade}
+            onChange={(e) => setValidade(e.target.value)}
+          />
         </SCDiv>
 
-        <button>ASSINAR</button>
+        <SCBotaoAssinar onClick={assinar} type="button">
+          ASSINAR
+        </SCBotaoAssinar>
+
+        <SCContainerModal displayModal={displayModal}>
+          <img onClick={() => setDisModal("none")} src={fecharX} alt="fechar" />
+          <SCModal>
+            <SCDescricao>
+              <p>
+                Tem certeza que deseja assinar o plano {infoPlanoInd.name} (R${" "}
+                {infoPlanoInd.price})?
+              </p>
+            </SCDescricao>
+
+            <SCDivBotoes>
+              <SCBotaoNao onClick={() => setDisModal("none")}>Não</SCBotaoNao>
+              <SCBotaoSim type="submit">Sim</SCBotaoSim>
+            </SCDivBotoes>
+          </SCModal>
+        </SCContainerModal>
       </SCContainerForm>
     </SCContainerPage>
   );
@@ -180,22 +279,21 @@ const SCContainerForm = styled.form`
     border-radius: 8px;
     margin-bottom: 10px;
   }
+`;
+const SCBotaoAssinar = styled.button`
+  width: 300px;
+  height: 52px;
+  background: #ff4791;
+  border-radius: 8px;
+  border: none;
+  margin-top: 15px;
 
-  button {
-    width: 300px;
-    height: 52px;
-    background: #ff4791;
-    border-radius: 8px;
-    border: none;
-    margin-top: 15px;
-
-    font-family: "Roboto", sans-serif;
-    font-style: normal;
-    font-weight: 700;
-    font-size: 14px;
-    line-height: 16px;
-    color: #ffffff;
-  }
+  font-family: "Roboto", sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 16px;
+  color: #ffffff;
 `;
 
 const SCDiv = styled.div`
@@ -210,4 +308,92 @@ const SCDiv = styled.div`
     background: #ffffff;
     border-radius: 8px;
   }
+`;
+
+const SCContainerModal = styled.div`
+  background-color: rgba(0, 0, 0, 0.5);
+  width: 100%;
+  height: 100%;
+  display: ${(props) => props.displayModal};
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  img {
+    position: absolute;
+    right: 10px;
+    top: 20px;
+  }
+`;
+const SCModal = styled.div`
+  position: absolute;
+  left: 64px;
+  top: 230px;
+  width: 248px;
+  height: 210px;
+  background: #ffffff;
+  border-radius: 12px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+`;
+
+const SCDescricao = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  p {
+    font-family: "Roboto";
+    font-style: normal;
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 21px;
+    text-align: center;
+    color: #000000;
+  }
+`;
+
+const SCDivBotoes = styled.div`
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+`;
+const SCBotaoNao = styled.button`
+  width: 95px;
+  height: 52px;
+  left: 86px;
+  top: 376px;
+  background: #cecece;
+  border-radius: 8px;
+  border: none;
+
+  font-family: "Roboto";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 16px;
+  color: #ffffff;
+`;
+const SCBotaoSim = styled.button`
+  width: 95px;
+  height: 52px;
+  left: 195px;
+  top: 376px;
+  background: #ff4791;
+  border-radius: 8px;
+
+  font-family: "Roboto";
+  font-style: normal;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 16px;
+  color: #ffffff;
 `;
