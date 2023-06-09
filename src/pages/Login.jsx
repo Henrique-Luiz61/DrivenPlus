@@ -10,7 +10,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const { setInfo } = useContext(AuthContext);
+  const { setInfo, setAssinante, setAssPerks } = useContext(AuthContext);
 
   function fazerLogin(e) {
     e.preventDefault();
@@ -27,7 +27,13 @@ export default function Login() {
     promise.then((resp) => {
       console.log(resp.data);
       setInfo(resp.data);
-      navigate("/subscriptions");
+      if (resp.data.membership === null) {
+        navigate("/subscriptions");
+      } else {
+        setAssinante(resp.data.membership);
+        setAssPerks(resp.data.membership.perks);
+        navigate("/home");
+      }
     });
     promise.catch((erro) => {
       console.log(erro.response.data);

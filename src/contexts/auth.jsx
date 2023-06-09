@@ -8,6 +8,7 @@ export default function AuthProvider({ children }) {
   const [infoPlanoInd, setPlanoInd] = useState({});
   const [displayModal, setDisModal] = useState("none");
   const [infoAssinante, setAssinante] = useState({});
+  const [infoAssPerks, setAssPerks] = useState([]);
 
   return (
     <AuthContext.Provider
@@ -22,6 +23,8 @@ export default function AuthProvider({ children }) {
         setDisModal,
         infoAssinante,
         setAssinante,
+        infoAssPerks,
+        setAssPerks,
       }}
     >
       {children}

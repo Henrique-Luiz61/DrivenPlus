@@ -7,7 +7,6 @@ import Subscriptions from "./pages/Subscriptions";
 import Home from "./pages/Home";
 import SubscriptionIDPLANO from "./pages/SubscriptionIDPLANO";
 import AuthProvider from "./contexts/auth";
-import axios from "axios";
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -20,8 +19,6 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 function App() {
-  axios.defaults.headers.common["Authorization"] = "3oPD8DWbkC2ysAsbZJJEfSYf";
-
   return (
     <BrowserRouter>
       <ResetStyle />

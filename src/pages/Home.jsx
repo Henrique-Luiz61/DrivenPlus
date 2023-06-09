@@ -1,27 +1,67 @@
 import styled from "styled-components";
-import plano3 from "../img/plano3.png";
 import usuario from "../img/usuario.png";
+import { useContext } from "react";
+import { AuthContext } from "../contexts/auth";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function Home() {
+  const { infoAssinante, infoUsuario, infoAssPerks, setAssPerks } =
+    useContext(AuthContext);
+  const navigate = useNavigate();
+
+  function mudarPlano() {
+    let novoArray = [];
+    setAssPerks(novoArray);
+    navigate("/subscriptions");
+  }
+
+  function cancelarPlano() {
+    const URL =
+      "https://mock-api.driven.com.br/api/v4/driven-plus/subscriptions";
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${infoUsuario.token}`,
+      },
+    };
+
+    const promise = axios.delete(URL, config);
+
+    promise.then((resp) => {
+      console.log(resp.data);
+      navigate("/subscriptions");
+    });
+    promise.catch((erro) => {
+      console.log(erro.response);
+      alert(erro.response.data.message);
+    });
+  }
+
   return (
     <SCContainerPage>
       <SCHeader>
-        <SCImgPlano src={plano3} alt="plano 3" />
+        <SCImgPlano src={infoAssinante.image} alt="plano 3" />
         <SCImgUsuario src={usuario} alt="usuario" />
       </SCHeader>
 
-      <SCOlaFulano>Olá, Fulano</SCOlaFulano>
+      <SCOlaFulano>Olá, {infoUsuario.name}</SCOlaFulano>
 
       <SCContainerBotoes>
-        <button>Solicitar Brindes</button>
-        <button>Materiais bônus de web</button>
-        <button>Aulas bônus de tech</button>
-        <button>Mentorias personalizadas</button>
+        {infoAssPerks.map((p) => (
+          <button key={p.id}>
+            <a href={p.link} target="_blank" style={{ all: "unset" }}>
+              {p.title}
+            </a>
+          </button>
+        ))}
       </SCContainerBotoes>
 
       <SCFooter>
-        <SCBotaoMudarPlano>Mudar plano</SCBotaoMudarPlano>
-        <SCBotaoCancelar>Cancelar plano</SCBotaoCancelar>
+        <SCBotaoMudarPlano onClick={mudarPlano}>Mudar plano</SCBotaoMudarPlano>
+        <SCBotaoCancelar onClick={cancelarPlano}>
+          Cancelar plano
+        </SCBotaoCancelar>
       </SCFooter>
     </SCContainerPage>
   );

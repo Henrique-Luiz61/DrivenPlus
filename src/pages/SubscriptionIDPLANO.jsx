@@ -17,6 +17,7 @@ export default function SubscriptionIDPLANO() {
     displayModal,
     setDisModal,
     setAssinante,
+    setAssPerks,
   } = useContext(AuthContext);
   const [nome, setNome] = useState("");
   const [digitos, setDigitos] = useState("");
@@ -57,7 +58,7 @@ export default function SubscriptionIDPLANO() {
       "https://mock-api.driven.com.br/api/v4/driven-plus/subscriptions";
 
     const novaAssinatura = {
-      membershipId: infoUsuario.id,
+      membershipId: idPlano,
       cardName: nome,
       cardNumber: digitos,
       securityNumber: codSeg,
@@ -74,7 +75,12 @@ export default function SubscriptionIDPLANO() {
 
     promise.then((resp) => {
       console.log(resp.data);
+      console.log("perks: ", resp.data.perks);
       setAssinante(resp.data);
+      let novo = [];
+      setAssPerks(novo);
+      let novoArray = resp.data.perks;
+      setAssPerks(novoArray);
       navigate("/home");
     });
     promise.catch((erro) => {
